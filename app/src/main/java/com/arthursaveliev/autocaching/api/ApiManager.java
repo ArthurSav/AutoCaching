@@ -1,11 +1,18 @@
 package com.arthursaveliev.autocaching.api;
 
+import com.arthursaveliev.autocaching.api.cache.CacheHelper;
 import com.arthursaveliev.autocaching.api.cache.converter.GsonConverterListener;
 import com.arthursaveliev.autocaching.api.cache.converter.GsonCustomConverterFactory;
+import com.arthursaveliev.autocaching.api.model.Post;
+import com.arthursaveliev.autocaching.data.BoxManager;
 import com.google.gson.TypeAdapter;
+import com.google.gson.reflect.TypeToken;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
@@ -49,8 +56,16 @@ class ApiManager implements GsonConverterListener {
         return builder.build();
     }
 
-
+    @SuppressWarnings("unchecked")
     @Override
-    public void onResponseBody(TypeAdapter typeAdapter, Object responseBody) {
+    public void onResponseBody(TypeAdapter typeAdapter, Type type, Object responseBody) {
+        Class clsType = CacheHelper.typeToClass(type);
+        if (clsType != null) {
+            if (responseBody instanceof Collection) {
+                List posts = (ArrayList) responseBody;
+                BoxManager.getStore().boxFor(clsType).put(posts);
+            }
+            else BoxManager.getStore().boxFor(clsType).put(responseBody);
+        }
     }
 }

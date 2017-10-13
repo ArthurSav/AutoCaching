@@ -36,7 +36,6 @@ public class MainActivity extends AppCompatActivity {
         disposable = Remote.syncPosts()
                 .doOnNext(this::setPosts)
                 .subscribe();
-        Class foo = Post.class;
     }
 
     private void setPosts(List<Post> posts){

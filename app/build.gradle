@@ -1,4 +1,8 @@
 apply plugin: 'com.android.application'
+dependencies {
+    debugImplementation "io.objectbox:objectbox-android-objectbrowser:1.1.0"
+}
+apply plugin: 'io.objectbox'
 
 android {
     compileSdkVersion 26
@@ -12,7 +16,7 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
-        release {
+        debug {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }

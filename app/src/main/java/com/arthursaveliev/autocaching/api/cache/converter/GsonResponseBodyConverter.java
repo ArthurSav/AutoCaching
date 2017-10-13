@@ -5,6 +5,7 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 
 import okhttp3.ResponseBody;
 import retrofit2.Converter;
@@ -12,11 +13,13 @@ import retrofit2.Converter;
 final class GsonResponseBodyConverter<T> implements Converter<ResponseBody, T> {
   private final Gson gson;
   private final TypeAdapter<T> adapter;
+  private final Type type;
   private final GsonConverterListener listener;
 
-  GsonResponseBodyConverter(Gson gson, TypeAdapter<T> adapter, GsonConverterListener listener) {
+  GsonResponseBodyConverter(Gson gson, TypeAdapter<T> adapter, Type type,  GsonConverterListener listener) {
     this.gson = gson;
     this.adapter = adapter;
+    this.type = type;
     this.listener = listener;
   }
 
@@ -24,7 +27,7 @@ final class GsonResponseBodyConverter<T> implements Converter<ResponseBody, T> {
     JsonReader jsonReader = gson.newJsonReader(value.charStream());
     try {
       T response = adapter.read(jsonReader);
-      if (listener != null) listener.onResponseBody(adapter, response);
+      if (listener != null) listener.onResponseBody(adapter, type, response);
       return response;
     } finally {
       value.close();
