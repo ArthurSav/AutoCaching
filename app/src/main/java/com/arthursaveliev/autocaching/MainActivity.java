@@ -1,28 +1,23 @@
 package com.arthursaveliev.autocaching;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-
 import com.arthursaveliev.autocaching.api.Remote;
-import com.arthursaveliev.autocaching.api.cache.Cacheable;
 import com.arthursaveliev.autocaching.api.model.Post;
+import com.arthursaveliev.autocaching.data.BoxManager;
 import com.arthursaveliev.autocaching.ui.PostAdapter;
-
-import java.util.List;
-
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
     private PostAdapter adapter;
 
-    private Disposable disposable;
+    private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,9 +28,14 @@ public class MainActivity extends AppCompatActivity {
         //local sync
 
         //remote sync
-        disposable = Remote.syncPosts()
-                .doOnNext(this::setPosts)
-                .subscribe();
+        compositeDisposable.add(Remote.syncPosts()
+            .doOnNext(this::setPosts)
+            .subscribe());
+        compositeDisposable.add(Remote.syncUsers()
+        .subscribe());
+        compositeDisposable.add(Remote.syncUser()
+            .subscribe());
+
     }
 
     private void setPosts(List<Post> posts){
@@ -51,6 +51,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        disposable.dispose();
+        compositeDisposable.dispose();
     }
 }

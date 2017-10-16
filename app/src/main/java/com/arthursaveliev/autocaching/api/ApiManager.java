@@ -1,29 +1,19 @@
 package com.arthursaveliev.autocaching.api;
 
-import com.arthursaveliev.autocaching.api.cache.CacheHelper;
-import com.arthursaveliev.autocaching.api.cache.converter.GsonConverterListener;
-import com.arthursaveliev.autocaching.api.cache.converter.GsonCustomConverterFactory;
-import com.arthursaveliev.autocaching.api.model.Post;
 import com.arthursaveliev.autocaching.data.BoxManager;
+import com.arthursaveliev.autocachingconveter.GsonCustomConverterFactory;
+import com.arthursaveliev.autocachingconveter.GsonResponseListener;
 import com.google.gson.TypeAdapter;
-import com.google.gson.reflect.TypeToken;
-
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-
 import okhttp3.OkHttpClient;
-import okhttp3.RequestBody;
-import okhttp3.ResponseBody;
 import okhttp3.logging.HttpLoggingInterceptor;
-import retrofit2.Converter;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
 
-class ApiManager implements GsonConverterListener {
+class ApiManager implements GsonResponseListener {
 
     private static final String URL = "https://jsonplaceholder.typicode.com/";
     private static ApiManager apiManager = new ApiManager();
@@ -44,7 +34,6 @@ class ApiManager implements GsonConverterListener {
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonCustomConverterFactory.create(this))
                 .build();
-
     }
 
     private OkHttpClient createClient(){
@@ -58,14 +47,8 @@ class ApiManager implements GsonConverterListener {
 
     @SuppressWarnings("unchecked")
     @Override
-    public void onResponseBody(TypeAdapter typeAdapter, Type type, Object responseBody) {
-        Class clsType = CacheHelper.typeToClass(type);
-        if (clsType != null) {
-            if (responseBody instanceof Collection) {
-                List posts = (ArrayList) responseBody;
-                BoxManager.getStore().boxFor(clsType).put(posts);
-            }
-            else BoxManager.getStore().boxFor(clsType).put(responseBody);
-        }
-    }
+    public void onCacheableResponse(Class type, Object responseBody) {
+        if (responseBody instanceof Collection) BoxManager.getStore().boxFor(type).put((ArrayList) responseBody);
+        else BoxManager.getStore().boxFor(type).put(responseBody);    }
+
 }

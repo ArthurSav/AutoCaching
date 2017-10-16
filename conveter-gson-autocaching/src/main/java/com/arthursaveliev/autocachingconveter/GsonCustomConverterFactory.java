@@ -1,21 +1,18 @@
-package com.arthursaveliev.autocaching.api.cache.converter;
+package com.arthursaveliev.autocachingconveter;
 
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
 import com.google.gson.reflect.TypeToken;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Converter;
 import retrofit2.Retrofit;
 
-
 public final class GsonCustomConverterFactory extends Converter.Factory {
 
-  public static GsonCustomConverterFactory create(GsonConverterListener listener){
+  public static GsonCustomConverterFactory create(GsonResponseListener listener){
     return create(new Gson(), listener);
   }
 
@@ -24,15 +21,15 @@ public final class GsonCustomConverterFactory extends Converter.Factory {
    * decoding from JSON (when no charset is specified by a header) will use UTF-8.
    */
   @SuppressWarnings("ConstantConditions") // Guarding public API nullability.
-  public static GsonCustomConverterFactory create(Gson gson, GsonConverterListener listener) {
+  public static GsonCustomConverterFactory create(Gson gson, GsonResponseListener listener) {
     if (gson == null) throw new NullPointerException("gson == null");
     return new GsonCustomConverterFactory(gson, listener);
   }
 
   private final Gson gson;
-  private GsonConverterListener listener;
+  private GsonResponseListener listener;
 
-  private GsonCustomConverterFactory(Gson gson, GsonConverterListener listener) {
+  private GsonCustomConverterFactory(Gson gson, GsonResponseListener listener) {
     this.gson = gson;
     this.listener = listener;
   }
@@ -40,7 +37,7 @@ public final class GsonCustomConverterFactory extends Converter.Factory {
   @Override
   public Converter<ResponseBody, ?> responseBodyConverter(Type type, Annotation[] annotations, Retrofit retrofit) {
     TypeAdapter<?> adapter = gson.getAdapter(TypeToken.get(type));
-    return new GsonResponseBodyConverter<>(gson, adapter, type, listener);
+    return new GsonResponseBodyConverter<>(gson, adapter, type, annotations, listener);
   }
 
   @Override
