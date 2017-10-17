@@ -5,12 +5,21 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+
 import com.arthursaveliev.autocaching.api.Remote;
 import com.arthursaveliev.autocaching.api.model.Post;
 import com.arthursaveliev.autocaching.data.BoxManager;
 import com.arthursaveliev.autocaching.ui.PostAdapter;
-import io.reactivex.disposables.CompositeDisposable;
+
 import java.util.List;
+
+import io.objectbox.query.Query;
+import io.objectbox.rx.RxQuery;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.BiFunction;
+import io.reactivex.functions.Consumer;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -25,20 +34,15 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         recyclerView = findViewById(R.id.recyclerView);
 
-        //local sync
+        Query<Post> postBox = BoxManager.getStore().boxFor(Post.class).query().build();
 
-        //remote sync
-        compositeDisposable.add(Remote.syncPosts()
-            .doOnNext(this::setPosts)
-            .subscribe());
-        compositeDisposable.add(Remote.syncUsers()
-        .subscribe());
-        compositeDisposable.add(Remote.syncUser()
-            .subscribe());
-
+        compositeDisposable.add(Observable.merge(RxQuery.observable(postBox), Remote.syncPosts())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(this::setPosts)
+                .subscribe());
     }
 
-    private void setPosts(List<Post> posts){
+    private void setPosts(List<Post> posts) {
         if (recyclerView.getAdapter() == null) {
             adapter = new PostAdapter();
             recyclerView.setLayoutManager(new LinearLayoutManager(this));

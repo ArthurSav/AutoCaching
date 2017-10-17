@@ -1,10 +1,9 @@
 package com.arthursaveliev.autocaching.api;
 
 import com.arthursaveliev.autocaching.data.BoxManager;
-import com.arthursaveliev.autocachingconveter.GsonCustomConverterFactory;
+import com.arthursaveliev.autocachingconveter.GsonCacheableConverter;
 import com.arthursaveliev.autocachingconveter.GsonResponseListener;
-import com.google.gson.TypeAdapter;
-import java.lang.annotation.Annotation;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import okhttp3.OkHttpClient;
@@ -32,7 +31,7 @@ class ApiManager implements GsonResponseListener {
                 .baseUrl(URL)
                 .client(createClient())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .addConverterFactory(GsonCustomConverterFactory.create(this))
+                .addConverterFactory(GsonCacheableConverter.create(this))
                 .build();
     }
 

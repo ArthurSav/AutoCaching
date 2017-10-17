@@ -10,9 +10,9 @@ import okhttp3.ResponseBody;
 import retrofit2.Converter;
 import retrofit2.Retrofit;
 
-public final class GsonCustomConverterFactory extends Converter.Factory {
+public final class GsonCacheableConverter extends Converter.Factory {
 
-  public static GsonCustomConverterFactory create(GsonResponseListener listener){
+  public static GsonCacheableConverter create(GsonResponseListener listener){
     return create(new Gson(), listener);
   }
 
@@ -21,15 +21,15 @@ public final class GsonCustomConverterFactory extends Converter.Factory {
    * decoding from JSON (when no charset is specified by a header) will use UTF-8.
    */
   @SuppressWarnings("ConstantConditions") // Guarding public API nullability.
-  public static GsonCustomConverterFactory create(Gson gson, GsonResponseListener listener) {
+  public static GsonCacheableConverter create(Gson gson, GsonResponseListener listener) {
     if (gson == null) throw new NullPointerException("gson == null");
-    return new GsonCustomConverterFactory(gson, listener);
+    return new GsonCacheableConverter(gson, listener);
   }
 
   private final Gson gson;
   private GsonResponseListener listener;
 
-  private GsonCustomConverterFactory(Gson gson, GsonResponseListener listener) {
+  private GsonCacheableConverter(Gson gson, GsonResponseListener listener) {
     this.gson = gson;
     this.listener = listener;
   }
