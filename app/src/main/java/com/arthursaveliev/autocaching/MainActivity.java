@@ -35,7 +35,6 @@ public class MainActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerView);
 
         Query<Post> postBox = BoxManager.getStore().boxFor(Post.class).query().build();
-
         compositeDisposable.add(Observable.merge(RxQuery.observable(postBox), Remote.syncPosts())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext(this::setPosts)

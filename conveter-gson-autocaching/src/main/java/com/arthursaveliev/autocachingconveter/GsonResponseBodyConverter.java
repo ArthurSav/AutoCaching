@@ -15,6 +15,7 @@ final class GsonResponseBodyConverter<T> implements Converter<ResponseBody, T> {
   private final Gson gson;
   private final TypeAdapter<T> adapter;
   private final GsonResponseListener listener;
+
   private final Class clsType;
   private final boolean isCacheable;
 

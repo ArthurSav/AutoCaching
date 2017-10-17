@@ -27,7 +27,7 @@ public final class GsonCacheableConverter extends Converter.Factory {
   }
 
   private final Gson gson;
-  private GsonResponseListener listener;
+  private final GsonResponseListener listener;
 
   private GsonCacheableConverter(Gson gson, GsonResponseListener listener) {
     this.gson = gson;
